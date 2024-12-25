@@ -6,6 +6,8 @@ import in.codecraftsbysanta.productcatalogservice.models.Category;
 import in.codecraftsbysanta.productcatalogservice.models.Product;
 import in.codecraftsbysanta.productcatalogservice.services.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -28,9 +30,14 @@ public class ProductController {
     }
 
     @GetMapping("/products/{productID}")
-    public ProductDTO findProductById(@PathVariable("productID") Long id) {
+    public ResponseEntity<ProductDTO> findProductById(@PathVariable("productID") Long id) {
+        if(id <= 0){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
         Product product = productService.getProductById(id);
-        return from(product);
+        if(product == null)
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(from(product), HttpStatus.OK);
     }
 
     private ProductDTO from (Product product) {
