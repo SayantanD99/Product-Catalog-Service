@@ -1,12 +1,12 @@
 package in.codecraftsbysanta.productcatalogservice.services;
 
+import in.codecraftsbysanta.productcatalogservice.clients.FakeStoreApiClient;
 import in.codecraftsbysanta.productcatalogservice.dtos.FakeStoreProductDTO;
 import in.codecraftsbysanta.productcatalogservice.models.Category;
 import in.codecraftsbysanta.productcatalogservice.models.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -24,12 +24,13 @@ public class FakeStoreProductService implements IProductService{
     @Autowired
     public RestTemplateBuilder restTemplateBuilder;
 
+    @Autowired
+    private FakeStoreApiClient fakeStoreApiClient;
+
     public Product getProductById(Long productId) {
-        RestTemplate restTemplate = restTemplateBuilder.build();
-        ResponseEntity<FakeStoreProductDTO> fakeStoreProductDTOResponseEntity = restTemplate.getForEntity("https://fakestoreapi.com/products/{productId}", FakeStoreProductDTO.class, productId);
-        if(fakeStoreProductDTOResponseEntity.getStatusCode().equals(HttpStatusCode.valueOf(200))
-                && fakeStoreProductDTOResponseEntity.getBody() != null) {
-            return from(fakeStoreProductDTOResponseEntity.getBody());
+        FakeStoreProductDTO fakeStoreProductDTO = fakeStoreApiClient.getProductById(productId);
+        if(fakeStoreProductDTO != null) {
+            return from(fakeStoreProductDTO);
         }
         return null;
     }

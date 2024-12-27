@@ -34,18 +34,23 @@ public class ProductController {
 
     @GetMapping("/products/{productID}")
     public ResponseEntity<ProductDTO> findProductById(@PathVariable("productID") Long productID) {
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        if(productID <= 0){
-            headers.add("Invalid Call", "Incorrect");
-            return new ResponseEntity<>(null, headers, HttpStatus.NOT_FOUND);
-        }
-        Product product = productService.getProductById(productID);
-        headers.add("Valid Call", "Correct");
-        if(product == null)
-            return new ResponseEntity<>(null, new HttpHeaders(headers), HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>(from(product), headers, HttpStatus.OK);
-    }
+        try {
+                MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+                if (productID <= 0) {
+                    headers.add("Invalid Call", "Incorrect");
+                    //return new ResponseEntity<>(null, headers, HttpStatus.NOT_FOUND);
+                    throw new IllegalArgumentException("Please try with Product ID greater than 0");
+                }
+            Product product = productService.getProductById(productID);
+            headers.add("Valid Call", "Correct");
+            if (product == null)
+                return new ResponseEntity<>(null, new HttpHeaders(headers), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(from(product), headers, HttpStatus.OK);
+        } catch (IllegalArgumentException exception) {
+            throw exception;
 
+        }
+    }
     private ProductDTO from (Product product) {
         ProductDTO productDto = new ProductDTO();
         productDto.setId(product.getId());
