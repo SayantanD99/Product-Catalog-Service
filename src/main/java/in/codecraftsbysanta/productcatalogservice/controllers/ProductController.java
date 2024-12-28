@@ -6,6 +6,7 @@ import in.codecraftsbysanta.productcatalogservice.models.Category;
 import in.codecraftsbysanta.productcatalogservice.models.Product;
 import in.codecraftsbysanta.productcatalogservice.services.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.List;
 public class ProductController {
 
     @Autowired
+    @Qualifier("sps")
     private IProductService productService;
 
     @GetMapping("/products")
@@ -69,8 +71,10 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public Product createProduct(@RequestBody Product product) {
-        return product;
+    public ProductDTO createProduct(@RequestBody ProductDTO productDTO) {
+        Product input = from(productDTO);
+        Product output = productService.save(input);
+        return from(output);
     }
 
     private Product from(ProductDTO productDto) {
@@ -82,6 +86,7 @@ public class ProductController {
         product.setDescription(productDto.getDescription());
         if(productDto.getCategory() != null) {
             Category category = new Category();
+            category.setId(productDto.getCategory().getId());
             category.setName(productDto.getCategory().getName());
             product.setCategory(category);
         }
