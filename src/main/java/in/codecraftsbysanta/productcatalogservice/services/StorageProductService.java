@@ -34,7 +34,18 @@ public class StorageProductService implements IProductService {
     @Override
     public Product replaceProduct(Long productId, Product request) {
 
-        return null;
+        Optional<Product> productOptional = productRepo.findProductById(productId);
+        if (productOptional.isEmpty()) {
+            return null;
+        }
+
+        Product existingProduct = productOptional.get();
+        existingProduct.setName(request.getName());
+        existingProduct.setDescription(request.getDescription());
+        existingProduct.setPrice(request.getPrice());
+        existingProduct.setImgUrl(request.getImgUrl());
+        existingProduct.setCategory(request.getCategory());
+        return productRepo.save(existingProduct);
 
     }
 
