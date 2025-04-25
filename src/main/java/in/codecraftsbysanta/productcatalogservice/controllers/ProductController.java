@@ -34,6 +34,13 @@ public class ProductController {
         return productDtos;
     }
 
+    @GetMapping("{pid}/{uid}")
+    public ProductDTO getProductDetailsBasedOnUserRole(@PathVariable Long pid,@PathVariable Long uid) {
+        Product product = productService.getProductBasedOnUser(pid,uid);
+        if(product == null) return  null;
+        return from(product);
+    }
+
     @GetMapping("/products/{productID}")
     public ResponseEntity<ProductDTO> findProductById(@PathVariable("productID") Long productID) {
         try {

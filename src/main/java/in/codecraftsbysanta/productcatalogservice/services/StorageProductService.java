@@ -1,10 +1,12 @@
 package in.codecraftsbysanta.productcatalogservice.services;
 
+import in.codecraftsbysanta.productcatalogservice.dtos.UserDTO;
 import in.codecraftsbysanta.productcatalogservice.models.Product;
 import in.codecraftsbysanta.productcatalogservice.repos.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +17,9 @@ public class StorageProductService implements IProductService {
 
     @Autowired
     private ProductRepo productRepo;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public Product getProductById(Long productId) {
@@ -55,5 +60,18 @@ public class StorageProductService implements IProductService {
 
         return productRepo.save(product);
 
+    }
+
+    @Override
+    public Product getProductBasedOnUser(Long productId, Long userId) {
+        Optional<Product> productOptional = productRepo.findProductById(productId);
+        UserDTO userDTO = restTemplate.getForEntity("http://userservice/users/{userId}", UserDTO.class,userId).getBody();
+        System.out.println(userDTO.getEmail());
+
+        if(userDTO != null) {
+            return productOptional.get();
+        }
+
+        return  null;
     }
 }
