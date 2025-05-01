@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/products")
 public class ProductController {
 
     @Autowired
@@ -41,7 +42,7 @@ public class ProductController {
         return from(product);
     }
 
-    @GetMapping("/products/{productID}")
+    @GetMapping("{productID}")
     public ResponseEntity<ProductDTO> findProductById(@PathVariable("productID") Long productID) {
         try {
                 MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
@@ -61,12 +62,15 @@ public class ProductController {
         }
     }
     private ProductDTO from (Product product) {
+
         ProductDTO productDto = new ProductDTO();
+
         productDto.setId(product.getId());
         productDto.setName(product.getName());
         productDto.setDescription(product.getDescription());
         productDto.setPrice(product.getPrice());
         productDto.setImgUrl(product.getImgUrl());
+
         if(product.getCategory() != null) {
             CategoryDTO categoryDto = new CategoryDTO();
             categoryDto.setName(product.getCategory().getName());
@@ -77,7 +81,7 @@ public class ProductController {
         return productDto;
     }
 
-    @PostMapping("/products")
+    @PostMapping
     public ProductDTO createProduct(@RequestBody ProductDTO productDTO) {
         Product input = from(productDTO);
         Product output = productService.save(input);
@@ -100,7 +104,7 @@ public class ProductController {
         return product;
     }
 
-    @PutMapping("/products/{productID}")
+    @PutMapping("/{productID}")
     public ProductDTO replaceProduct(@PathVariable("productID") Long productID, @RequestBody ProductDTO request) {
         Product product = productService.replaceProduct(productID, from(request));
         return from(product);
